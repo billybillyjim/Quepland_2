@@ -30,6 +30,104 @@ a, .btn-link {
     color: red;
 }
 
+.progress-bar {
+    -webkit-transition: width .15s cubic-bezier(0.65, 0.05, 0.36, 1) !important;
+    -moz-transition: width .15s cubic-bezier(0.65, 0.05, 0.36, 1) !important;
+    -o-transition: width .15s cubic-bezier(0.65, 0.05, 0.36, 1) !important;
+    -ms-transition: width .15s cubic-bezier(0.65, 0.05, 0.36, 1) !important;
+    transition: width .15s cubic-bezier(0.65, 0.05, 0.36, 1) !important;
+}
+
+.unselectable {
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+}
+
+.sidebar-buttons {
+    border-radius: 0px;
+    line-height: 15px;
+    color: white;
+    font-size: small;
+    text-align: center;
+    margin: 0px;
+    height: 60px;
+    padding: 0px;
+    min-width: 60px;
+}
+
+.custom-dropdown {
+    background-color: #1b6ec2;
+    border-radius: 0.25rem;
+    color: white;
+    width: 200px;
+    height: 35px;
+    padding: 5px 12px 5px 12px;
+    position: relative;
+    margin: 10px 0px 10px 0px;
+}
+
+.custom-dropdown-item {
+    background-color: white;
+    color: #212529;
+    width: 100%;
+}
+
+    .custom-dropdown-item:hover {
+        background-color: whitesmoke;
+    }
+
+    .custom-dropdown-item:active {
+        background-color: #6c757d;
+        color: white;
+    }
+
+.custom-scrollbar {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+}
+
+.bank-scroll {
+    height: calc(100vh - 420px);
+}
+
+    .bank-scroll::-webkit-scrollbar {
+        height: calc(100% - 220px);
+        width: 18px;
+        background: darkgray;
+        scrollbar-face-color: lightgray;
+    }
+
+    .bank-scroll::-webkit-scrollbar-thumb {
+        background-color: lightgray;
+        border-right: none;
+        border-left: none;
+    }
+
+.custom-scroll::-webkit-scrollbar {
+    width: 18px;
+    background: darkgray;
+    scrollbar-face-color: lightgray;
+    border-radius: 0.25rem;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+    background-color: lightgray;
+    border-right: none;
+    border-left: none;
+    border-radius: 0.25rem;
+}
+
+.item-view-button {
+    right: 5px;
+    position: absolute;
+    bottom: 5px;
+}
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
