@@ -1,0 +1,165 @@
+﻿@inject GameState GameState
+@inject NavigationManager UriHelper
+@implements IDisposable
+
+<div style="position:absolute;left:300px;top:50px;display:flex;margin-top:10px;padding:5px;min-height:700px;background-color:black;width:@(GameState.MinWindowWidth)px">
+    <div>
+        <div>
+            Set Main Window Size:
+        </div>
+        <button class="btn btn-primary" style="margin:10px;padding:10px;" @onclick="@(() => ResizeWindow(600))">Small (600px)</button>
+        <button class="btn btn-primary" style="margin:10px;padding:10px;" @onclick="@(() => ResizeWindow(686))">Less Small (686px)</button>
+        <button class="btn btn-primary" style="margin:10px;padding:10px;" @onclick="@(() => ResizeWindow(900))">Medium (900px)</button>
+        <button class="btn btn-primary" style="margin:10px;padding:10px;" @onclick="@(() => ResizeWindow(1200))">Less Wide (1200px)</button>
+        <button class="btn btn-primary" style="margin:10px;padding:10px;" @onclick="@(() => ResizeWindow(1260))">Wide (1260px)</button>
+    </div>
+    <div>
+        <button class="btn btn-primary" @onclick="@(() => SaveManager.SaveGame())">Manual Save</button>
+        <div>
+            The game autosaves once every half hour, but you can manually save here. If it was successful, the save time in the bottom left corner will change.
+        </div>
+        <div>
+            <button class="btn btn-primary" style="margin:10px;padding:10px;" @onclick="@(() => CompactInventory())">Compact Inventory</button>
+        </div>
+        <div>
+            <button class="btn btn-primary" style="margin:10px;padding:10px;" @onclick="@(() => HideLockedItems())">Hide Locked Items</button>
+        </div>
+        @if (hasRestoredFollowers == false)
+        {
+            <div style="overflow:auto;max-height:150px;">
+                @if (restoreFollowersMenu)
+                {
+                    <div>Select the followers you lost during the last update, then scroll to the bottom and click restore.</div>
+                    @foreach (Follower f in FollowerManager.Instance.Followers)
+                    {
+                        @if (followersToRestore.Contains(f))
+                        {
+                            <button class="btn btn-primary" style="margin:10px;opacity:0.5" @onclick="@(() => ToggleFollower(f))">Adding @f.Name</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" style="margin:10px;" @onclick="@(() => ToggleFollower(f))">@f.Name</button>
+                        }
+
+                    }
+                    <div>
+                        <button class="btn btn-primary" style="margin:10px;padding:10px;" @onclick="@(() => RestoreFollowers())">Restore</button>
+                    </div>
+                }
+                else
+                {
+                    <div>
+                        <button class="btn btn-primary" style="margin:10px;padding:10px;" @onclick="@(() => restoreFollowersMenu = true)">Follower Restore</button>
+                    </div>
+                }
+            </div>
+
+        }
+
+
+    </div>
+    <div>
+        You can export your save to keep a backup somewhere. You can load an exported save from the main menu.
+        <button class="btn btn-primary" style="margin:10px;padding:10px;" @onclick="@(() => ExportSave())">Export Save</button>
+        @if (exportedSave != "")
+        {
+            <button class="btn btn-primary" style="margin:10px;padding:10px;" @onclick="@(() => ImportSave())">Import Save</button>
+        }
+        else
+        {
+            <button class="btn btn-primary" style="margin:10px;padding:10px;opacity:0.5"> Import Save</button>
+        }
+        <input @bind-value="@exportedSave" />
+    </div>
+    @if (false)
+    {
+<div>
+    <button class="btn btn-primary" style="margin:10px;padding:10px;" @onclick="@(() => EnableNewCompression())">Compression</button>
+</div>
+    }
+    <div style="text-align:center;position:absolute;right:25%;bottom:100px;width:300px;">
+        <a target="_blank" href="https://www.patreon.com/billybillyjim"><img style="height:50px;width:50px;background-color:white;border-radius:5px;padding:5px;cursor:pointer;" src="/data/Images/PatreonMark.png" /></a> Please consider supporting development on <a target="_blank" href="https://www.patreon.com/billybillyjim">Patreon</a>
+    </div>
+    <br />
+    <div style="text-align:center;position:absolute;right:25%;bottom:10px;width:300px;">
+        <a target="_blank" href="https://discord.gg/bkH9MZa"><img style="height:50px;width:50px;background-color:white;border-radius:5px;cursor:pointer;" src="/data/Images/DiscordLogo.png" /></a> Join the <a target="_blank" href="https://discord.gg/bkH9MZa">Discord</a> for suggestions, guides, and community
+    </div>
+    <div style="position:absolute;right:10px;bottom:10px;">
+        Version:@GameState.Version
+    </div>
+</div>
+
+    @code {
+        private string exportedSave = "";
+        private bool restoreFollowersMenu;
+        private bool hasRestoredFollowers;
+        private List<Follower> followersToRestore = new List<Follower>();
+
+        public void ToggleFollower(Follower f)
+        {
+            if(followersToRestore.Contains(f) == false)
+            {
+                followersToRestore.Add(f);
+            }
+            else
+            {
+                followersToRestore.Remove(f);
+            }
+            GameState.UpdateState();
+        }
+        public void HideLockedItems()
+        {
+            GameState.HideLockedItems = !GameState.HideLockedItems;
+            Player.Instance.Inventory.RerenderAll();
+            GameState.UpdateState();
+        }
+
+        public void RestoreFollowers()
+        {
+            foreach(Follower f in followersToRestore)
+            {
+                f.IsUnlocked = true;
+                MessageManager.AddMessage(f.Name + " has returned to you.");
+            }
+            hasRestoredFollowers = true;
+            SaveManager.SaveGame();
+            GameState.UpdateState();
+        }
+
+        public void CompactInventory()
+        {
+            GameState.CompactInventoryView = !GameState.CompactInventoryView;
+            GameState.UpdateState();
+        }
+        public void EnableNewCompression()
+        {
+            GameState.UseNewSaveCompression = !GameState.UseNewSaveCompression;
+        }
+        public bool IsTesting()
+        {
+            return UriHelper.BaseUri.Contains("localhost");
+
+        }
+        public void ExportSave()
+        {
+            exportedSave = SaveManager.GetSaveExport();
+        }
+        public void ImportSave()
+        {
+            SaveManager.ImportSave(exportedSave);
+        }
+        public void ResizeWindow(int w)
+        {
+            GameState.MinWindowWidth = w;
+            GameState.UpdateState();
+        }
+        protected override void OnInitialized()
+        {
+            GameState.StateChanged += OnGameStateChanged;
+        }
+        public void Dispose()
+        {
+            GameState.StateChanged -= OnGameStateChanged;
+        }
+        void OnGameStateChanged(object sender, EventArgs e) => StateHasChanged();
+    }
